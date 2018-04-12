@@ -327,8 +327,18 @@ var Promise = require('bluebird'),
       //  }
       //  return al;
       // };
-    if (_flags.ignore && _includes(_flags.ignore.split(','), node.name)) {
-      return '';
+    if (_flags.ignore) {
+      var dirsOrFiles = [];
+      _flags.ignore.split(',').forEach(e => {
+        var elem = e.trim();
+        if (/\/$/.test(elem)) {
+          elem = elem.substr(0, elem.length - 1);
+        }
+        dirsOrFiles.push(elem);
+      });
+      if (_includes(dirsOrFiles, node.name)) {
+        return '';
+      }
     }
     if (node.type === 'symboliclink' && !_flags.link) {
       return '';
