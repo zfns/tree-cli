@@ -34,7 +34,7 @@ var Promise = require('bluebird'),
     indent: DEFAULT_INDENT,
     // --ignore
     // ignores specified directory/files
-    ignore: [],
+    ignore: '',
     // --fullpath
     // prints the full path prefix for each file.
     fullpath: false,
@@ -327,7 +327,7 @@ var Promise = require('bluebird'),
       //  }
       //  return al;
       // };
-    if (_includes(_flags.ignore, node.name)) {
+    if (_flags.ignore && _includes(_flags.ignore.split(','), node.name)) {
       return '';
     }
     if (node.type === 'symboliclink' && !_flags.link) {
@@ -394,6 +394,7 @@ var Promise = require('bluebird'),
         if (!_flags.o) {
           return
         }
+        str = parseStr(str);
         return fs.writeFileAsync(_flags.o, str)
           .then(function () {
             console.log('Finish writing to file:',
@@ -411,6 +412,36 @@ var Promise = require('bluebird'),
       });
 
   };
+
+function parseStr(str = '') {
+  const ARR = str.split('\n');
+  const MAX_LEN = getMaxLen(ARR);
+  const RET = [];
+
+  ARR.forEach(e => {
+    RET.push(e + genSpaces(MAX_LEN + 2 - e.length) + '#');
+  });
+
+  return RET.join('\n');
+}
+
+function getMaxLen(arr = []) {
+  let len = arr[0].length;
+  arr.forEach(e => {
+    if (e.length > len) {
+      len = e.length;
+    }
+  });
+  return len;
+}
+
+function genSpaces(len = 0) {
+  let str = ''
+  for (let i = 0; i < len; i++) {
+    str += ' ';
+  }
+  return str;
+}
 
 module.exports = {
 
